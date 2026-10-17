@@ -1,0 +1,380 @@
+{
+  "info": {
+    "_postman_id": "2a59b593-0f80-4308-8594-3dda1ca68f90",
+    "name": "EventAPi TEsting",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58580926",
+    "_collection_link": "https://go.postman.co/collection/58580926-2a59b593-0f80-4308-8594-3dda1ca68f90?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData=pm.response.json();\npm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});\n\npm.test(\"Response has success true\", function () {\n    var jsonData = pm.response.json();\n    pm.expect(jsonData.success).to.be.true;\n});\n\npm.test(\"Response contains token\", function () {\n    var jsonData = pm.response.json();\n    pm.expect(jsonData).to.have.property('token');\n    pm.expect(pm.collectionVariables.get(\"registered_email\"))\n  .to.eql(jsonData.user.email);\n});\npm.test(\"user email conformation\",()=>{\n    pm.expect(pm.collectionVariables.get(\"registered_email\"))\n  .to.eql(jsonData.user.email);\n})"
+            ]
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const randomNumber = Math.floor(Math.random() * 10000);\r\n\r\nconst email = `ayanzulfeqar${randomNumber}@example.com`;\r\n\r\npm.collectionVariables.set(\"registered_email\", email);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"{{registered_email}}\",\r\n  \"password\": \"secret123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{event_url}}/auth/register",
+          "host": [
+            "{{event_url}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "LOgin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response has success true\", function () {\n    const datajson = pm.response.json();\n    pm.expect(datajson.success).to.be.true;\n    pm.collectionVariables.set(\"token\", datajson.token);\n    \n});\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"{{registered_email}}\",\r\n  \"password\": \"secret123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{event_url}}/auth/login",
+          "host": [
+            "{{event_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "createEvent",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const datajson = pm.response.json();\npm.test(\"Status code is 201\", function () {\n    pm.expect(pm.response.code).to.eql(201);\n    pm.expect(datajson.data.city).to.eql(\"Sialkot\");\n    pm.collectionVariables.set(\"event_id\", datajson.data.id);\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"laptop \",\r\n  \"description\": \"A premier technology conference.\",\r\n  \"category\": \"Conference\",\r\n  \"venue\": \"Bangalore International Centre\",\r\n  \"city\": \"Sialkot\",\r\n  \"eventDate\": \"2026-11-15T09:00:00.000Z\",\r\n  \"price\": 3200,\r\n  \"totalSeats\": 1000,\r\n  \"imageUrl\": \"https://example.com/banner.jpg\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{event_url}}/events",
+          "host": [
+            "{{event_url}}"
+          ],
+          "path": [
+            "events"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getEvent",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{event_url}}/events/{{event_id}}",
+          "host": [
+            "{{event_url}}"
+          ],
+          "path": [
+            "events",
+            "{{event_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "UpdateEvent",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Macbook is on fire in 2026\",\r\n  \"description\": \"A premier technology conference.\",\r\n  \"category\": \"Conference\",\r\n  \"venue\": \"Bangalore International Centre\",\r\n  \"city\": \"Bangalore\",\r\n  \"eventDate\": \"2026-11-15T09:00:00.000Z\",\r\n  \"price\": 2000,\r\n  \"totalSeats\": 1000,\r\n  \"imageUrl\": \"https://example.com/banner.jpg\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{event_url}}/events/{{event_id}}",
+          "host": [
+            "{{event_url}}"
+          ],
+          "path": [
+            "events",
+            "{{event_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "CreateBooking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData = pm.response.json();\n\npm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});\n\npm.test(\"Booking is successful\", function () {\n    pm.expect(jsonData.success).to.be.true;\n    pm.expect(jsonData.message).to.eql(\"Booking confirmed!\");\n});\n\npm.test(\"Booking details are correct\", function () {\n    pm.expect(jsonData.data).to.be.an(\"object\");\n    pm.expect(jsonData.data.id).to.be.a(\"number\");\n    pm.expect(jsonData.data.status).to.eql(\"confirmed\");\n    pm.expect(jsonData.data.customerEmail).to.be.a(\"string\");\n    pm.collectionVariables.set(\"booking_ref\",jsonData.data.bookingRef);\n   pm.environment.set(\"booking_id\", String(jsonData.data.id));\n});\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventId\": {{event_id}},\r\n  \"customerName\": \"Priya Sharma\",\r\n  \"customerEmail\": \"priya.sharma@email.com\",\r\n  \"customerPhone\": \"+91-9876543210\",\r\n  \"quantity\": 2\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{event_url}}/bookings",
+          "host": [
+            "{{event_url}}"
+          ],
+          "path": [
+            "bookings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetBookingByRef",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData = pm.response.json();\n\npm.test(\"Status code is 200\", () => {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response contains success: true\", () => {\n    pm.expect(jsonData.success).to.be.true;\n});\n\npm.test(\"userid check\",()=>{\n    pm.expect(jsonData.data.userId).not.eql(null);\n});\n\npm.test(\"Customer name conformation\",()=>{\n    pm.expect(jsonData.data.customerName).not.eql(null);\n    pm.expect(jsonData.data.customerName).to.be.a('string');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{event_url}}/bookings/ref/{{booking_ref}}",
+          "host": [
+            "{{event_url}}"
+          ],
+          "path": [
+            "bookings",
+            "ref",
+            "{{booking_ref}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "deleteBooking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData= pm.response.json();\r\npm.test(\"Status code is 200\", function () {\r\npm.response.to.have.status(\"OK\")\r\n});\r\npm.test(\"Success is true\", function () {\r\n    pm.expect(jsonData.success).to.be.true;\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{event_url}}/bookings/{{booking_id}}",
+          "host": [
+            "{{event_url}}"
+          ],
+          "path": [
+            "bookings",
+            "{{booking_id}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "event_url",
+      "value": ""
+    },
+    {
+      "key": "event_id",
+      "value": ""
+    },
+    {
+      "key": "booking_ref",
+      "value": ""
+    },
+    {
+      "key": "registered_email",
+      "value": ""
+    }
+  ]
+}
